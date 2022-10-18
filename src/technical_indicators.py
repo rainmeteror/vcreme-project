@@ -121,6 +121,38 @@ def ppo(panel_data):
     return panel_data
 
 
+# 4. William R
+def williamR(panel_data, lookback: int):
+    panel_data['highest_high_14'] = panel_data.groupby('Ticker')['High'].rolling(lookback).max().reset_index(drop=True).to_list()
+    panel_data['lowest_low_14'] = panel_data.groupby('Ticker')['Low'].rolling(lookback).min().reset_index(drop=True).to_list()
+    panel_data[f'{lookback}_day_wr'] = (panel_data['highest_high_14'] - panel_data['Close'])/(panel_data['highest_high_14'] - panel_data['lowest_low_14'])*(-100)
+    
+    del panel_data['highest_high_14']
+    del panel_data['lowest_low_14']
+    
+    return panel_data
+
+
+# 5. Chande Momentum Oscillator
+def chandeMO(panel_data, lookback:int):
+    panel_data['previous_close'] = panel_data.groupby('Ticker')['Close'].shift(1)
+    panel_data['delta'] = panel_data.groupby('Ticker')['Close'].diff(1)
+    panel_data['higher_close'] = np.where(panel_data['delta']>=0, panel_data['delta'], 0)
+    panel_data['lower_close'] = np.where(panel_data['delta']<0, panel_data['delta']*(-1), 0)
+    panel_data['higher_close_14'] = panel_data.groupby('Ticker')['higher_close'].rolling(lookback).sum().reset_index(drop=True).to_list()
+    panel_data['lower_close_14'] = panel_data.groupby('Ticker')['lower_close'].rolling(lookback).sum().reset_index(drop=True).to_list()
+    panel_data[f'chande_mo_{lookback}'] = (panel_data['higher_close_14'] - panel_data['lower_close_14'])/(panel_data['higher_close_14'] + panel_data['lower_close_14'])*100
+    
+    del panel_data['previous_close']
+    del panel_data['delta']
+    del panel_data['higher_close']
+    del panel_data['lower_close']
+    del panel_data['higher_close_14']
+    del panel_data['lower_close_14']
+    
+    return panel_data
+
+
 # Process Volume Group
 # 1. On Balance Volume
 def obv(panel_data):
