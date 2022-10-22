@@ -3,9 +3,9 @@ import numpy as np
 
 
 list_path = [
-    r"E:\Tung\Python\VcreamProject\cache\CafeF.HNX.Upto14.10.2022.csv",
-    r"E:\Tung\Python\VcreamProject\cache\CafeF.HSX.Upto14.10.2022.csv",
-    r"E:\Tung\Python\VcreamProject\cache\CafeF.UPCOM.Upto14.10.2022.csv"
+    r"E:\Tung\Python\VcreamProject\cache\CafeF.HNX.Upto18.10.2022.csv",
+    r"E:\Tung\Python\VcreamProject\cache\CafeF.HSX.Upto18.10.2022.csv",
+    r"E:\Tung\Python\VcreamProject\cache\CafeF.UPCOM.Upto18.10.2022.csv"
 ]
 
 df = pd.concat(pd.read_csv(l) for l in list_path)

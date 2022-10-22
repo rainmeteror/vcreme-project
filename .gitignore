@@ -1,0 +1,8 @@
+# Do not add .venv
+.venv
+
+# Do not config
+config/
+
+# Do not add cache
+cache/
