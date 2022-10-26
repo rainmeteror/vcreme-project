@@ -70,6 +70,16 @@ def natr(panel_data):
     return panel_data
 
 
+# 5. Disparity Index
+def disparity_index(panel_data, lookbacks: int):
+    panel_data['moving_average_14'] = panel_data.groupby('Ticker')['Close'].rolling(lookbacks).mean().reset_index(drop=True).to_list()
+    panel_data[f'disparity_index_{lookbacks}'] = (panel_data['Close'] - panel_data['moving_average_14'])/(panel_data['moving_average_14'])*100
+    
+    del panel_data['moving_average_14']
+    
+    return panel_data
+
+
 # Process Momentum Group
 # 1. RSI
 def rsi(panel_data, lookback: int):
@@ -153,6 +163,20 @@ def chandeMO(panel_data, lookback:int):
     return panel_data
 
 
+# 6. Commodity Channel Index
+def cci(panel_data, lookbacks: int):
+    panel_data['typical_price'] = np.mean(panel_data[['High', 'Low', 'Close']], axis=1)
+    panel_data['typical_price_ma14'] = panel_data.groupby('Ticker')['typical_price'].rolling(lookbacks).mean().reset_index(drop=True).to_list()
+    panel_data['typical_price_std14'] = panel_data.groupby('Ticker')['typical_price'].rolling(lookbacks).std().reset_index(drop=True).to_list()
+    panel_data[f'cci_{lookbacks}'] = (panel_data['typical_price'] - panel_data['typical_price_ma14'])/(0.015 * panel_data['typical_price_std14'])
+
+    del panel_data['typical_price']
+    del panel_data['typical_price_ma14']
+    del panel_data['typical_price_std14']
+
+    return panel_data
+
+
 # Process Volume Group
 # 1. On Balance Volume
 def obv(panel_data):
@@ -195,6 +219,22 @@ def mfi(panel_data, lookback: int):
     del panel_data['negative_money_flow_ma']
     del panel_data['money_flow_ratio']
 
+    return panel_data
+
+
+# 4. Accumulation and Distribution Line
+def accumulation_distribution(panel_data):
+    for index, row in panel_data.iterrows():
+        if row['High'] != row['Low']:
+            ac = ((row['Close'] - row['Low']) - (row['High'] - row['Close']))/(row['High'] - row['Low']) * row['Volume']
+        else:
+            ac = 0
+        panel_data.at[index, 'mf_volume'] = ac
+    
+    panel_data['acc_dist_line'] = panel_data.groupby('Ticker')['mf_volume'].cumsum()
+    
+    del panel_data['mf_volume']
+    
     return panel_data
 
 
