@@ -5,6 +5,6 @@ import pandas as pd
 import numpy as np
 
 
-df = vnf.get_bs_data('BID')
-
-print(df.columns)
+df = vnf.get_stock_data('HPG', 'D')
+df = ta.moving_average(df)
+print((df))
